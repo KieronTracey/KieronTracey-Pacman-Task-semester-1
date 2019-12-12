@@ -78,6 +78,7 @@ struct Menu
 	Vector2* StringPositionScore;
 	bool paused;
 	bool pKeyDown;
+	Texture2D* floor;
 };
 
 //struct _backgroundmusic

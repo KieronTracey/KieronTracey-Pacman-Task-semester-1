@@ -61,6 +61,9 @@ Pacman::Pacman(int argc, char* argv[]) : Game(argc, argv)
 	Graphics::Initialise(argc, argv, this, 1024, 768, false, 25, 25, "Pacman", 60);
 	Input::Initialise();
 
+	//sets the background music to looping
+	_backgroundmusic->SetLooping(true);
+
 	// Start the Game Loop - This calls Update and Draw in game loop
 	Graphics::StartGameLoop();
 
@@ -113,6 +116,10 @@ Pacman::~Pacman()
 void Pacman::LoadContent()
 {
 	int i;
+
+	_pausemenu->floor = new Texture2D();
+	_pausemenu->floor->Load("Textures/floor.png",false);
+
 
 	// Load Pacman
 	_pacman->Texture = new Texture2D();
@@ -168,10 +175,10 @@ void Pacman::LoadContent()
 	_pausemenu->Rectangle = new Rect(0.0f, 0.0f, Graphics::GetViewportWidth(), Graphics::GetViewportHeight());
 	_pausemenu->StringPosition = new Vector2(Graphics::GetViewportWidth() / 2.0f, Graphics::GetViewportHeight() / 2.0f);
 	_pausemenu->StringPositionScore = new Vector2(Graphics::GetViewportWidth() / 3.0f, Graphics::GetViewportHeight() / 25.0f);
-	
-	//sets background music
-	Audio::Play(_backgroundmusic);
 
+	
+
+	Audio::Play(_backgroundmusic);
 }
 
 // Function Header Block
@@ -222,12 +229,16 @@ void Pacman::Update(int elapsedTime)
 
 void Pacman::Draw(int elapsedTime)
 {
+	
+
 	// Allows us to easily create a string
 	std::stringstream stream;
 	stream << "Pacman X: " << _pacman->Position->X << " Y: " << _pacman->Position->Y;
 	
 	// Starts Drawing
 	SpriteBatch::BeginDraw(); 
+
+	SpriteBatch::Draw(_pausemenu->floor, _pausemenu->Rectangle, nullptr);
 
 	// Draws Pacman
 	if (!_pacman->dead)
@@ -260,6 +271,12 @@ void Pacman::Draw(int elapsedTime)
 		SpriteBatch::DrawString(menuStream.str().c_str(), _pausemenu->StringPosition, Color::Red);
 	}
 
+	//draws ghost
+	for (int i = 0; i < GHOSTCOUNT; i++)
+	{
+		SpriteBatch::Draw(_ghosts[i]->texture, _ghosts[i]->position, _ghosts[i]->sourceRect);
+	}
+
 	if (_pacman->dead)
 	{
 		std::stringstream menuStream;
@@ -275,11 +292,7 @@ void Pacman::Draw(int elapsedTime)
 
 	SpriteBatch::DrawString(menuStream.str().c_str(), _pausemenu->StringPositionScore, Color::Yellow);
 
-	//draws ghost
-	for (int i = 0; i < GHOSTCOUNT; i++)
-	{
-		SpriteBatch::Draw(_ghosts[i]->texture, _ghosts[i]->position, _ghosts[i]->sourceRect);
-	}
+	
 
 	SpriteBatch::EndDraw(); // Ends Drawing
 }
